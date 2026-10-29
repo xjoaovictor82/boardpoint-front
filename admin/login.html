@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login — Board Point Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="assets/css/admin.css" />
+  </head>
+  <body>
+    <div class="tela-login">
+      <div class="cartao-login">
+        <div class="marca">BOARD POINT</div>
+        <div class="subtitulo">Painel administrativo</div>
+
+        <div class="mensagem-erro" id="mensagem-status"></div>
+
+        <form id="form-login">
+          <div class="campo-grupo mb-3">
+            <label for="login-usuario">Usuário</label>
+            <input
+              type="text"
+              id="login-usuario"
+              name="usuario"
+              class="form-control"
+              autocomplete="username"
+              required
+            />
+          </div>
+          <div class="campo-grupo mb-3">
+            <label for="login-senha">Senha</label>
+            <input
+              type="password"
+              id="login-senha"
+              name="senha"
+              class="form-control"
+              autocomplete="current-password"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            class="botao-primario btn w-100"
+            id="botaoEntrar"
+          >
+            Entrar
+          </button>
+        </form>
+
+        <a href="../index.html" class="link-voltar-site mt-3 d-inline-block"
+          >← Voltar ao site</a
+        >
+      </div>
+    </div>
+
+    <script>
+      const form = document.getElementById("form-login");
+      const msg = document.getElementById("mensagem-status");
+      const botao = document.getElementById("botaoEntrar");
+
+      function mostrarErro(texto) {
+        msg.textContent = texto;
+        msg.classList.add("ativo");
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        msg.classList.remove("ativo");
+        botao.disabled = true;
+        try {
+          const resp = await fetch("api/auth.php?acao=login", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              usuario: document.getElementById("login-usuario").value.trim(),
+              senha: document.getElementById("login-senha").value,
+            }),
+          });
+          const data = await resp.json();
+          if (!resp.ok || !data.sucesso) {
+            mostrarErro(data.erro || "Não foi possível entrar.");
+            return;
+          }
+          window.location.href = "pages/dashboard.html";
+        } catch {
+          mostrarErro("Erro de conexão com o servidor.");
+        } finally {
+          botao.disabled = false;
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mensagens — Board Point Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <div id="sidebarAdmin" data-ativo="contatos"></div>
+
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Mensagens</h1>
+    </div>
+
+    <div class="painel">
+      <div class="painel-cabecalho">
+        <h2>Contatos recebidos pelo site</h2>
+        <span id="contagemContatos" style="color: var(--cinza); font-size: 0.85rem;"></span>
+      </div>
+      <table class="tabela-admin table table-dark table-hover align-middle">
+        <thead>
+          <tr>
+            <th style="width:110px">Recebido em</th>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Mensagem</th>
+            <th style="width:90px">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="corpoContatos">
+          <tr><td colspan="5" class="estado-vazio">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/template-sidebar.js"></script>
+<script src="../assets/js/comum.js"></script>
+<script>
+let contatos = [];
+
+function formatarData(iso) {
+  const d = new Date(iso.replace(' ', 'T'));
+  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+
+function escaparHtml(texto) {
+  const div = document.createElement('div');
+  div.textContent = texto;
+  return div.innerHTML;
+}
+
+async function carregarContatos() {
+  const data = await apiFetch('contato.php');
+  if (!data.sucesso) {
+    mostrarToast(data.erro, 'erro');
+    return;
+  }
+  contatos = data.dados;
+  renderizarTabela();
+}
+
+function renderizarTabela() {
+  const corpo = document.getElementById('corpoContatos');
+  const contagem = document.getElementById('contagemContatos');
+
+  contagem.textContent = contatos.length === 1
+    ? '1 mensagem'
+    : contatos.length + ' mensagens';
+
+  if (contatos.length === 0) {
+    corpo.innerHTML = '<tr><td colspan="5" class="estado-vazio">Nenhuma mensagem recebida ainda.</td></tr>';
+    return;
+  }
+
+  corpo.innerHTML = contatos.map(c => `
+    <tr style="${c.lida ? '' : 'font-weight:600;'}">
+      <td style="white-space:nowrap; font-size:0.8rem;">${formatarData(c.criado_em)}</td>
+      <td>${escaparHtml(c.nome)}</td>
+      <td><a href="mailto:${escaparHtml(c.email)}" style="color:var(--amarelo);">${escaparHtml(c.email)}</a></td>
+      <td style="max-width:360px; white-space:pre-wrap;">${escaparHtml(c.mensagem)}</td>
+      <td>
+        <div class="acoes-linha">
+          <button class="botao-icone" onclick="alternarLida(${c.id}, ${c.lida ? 0 : 1})" title="${c.lida ? 'Marcar como não lida' : 'Marcar como lida'}">${c.lida ? '↺' : '✓'}</button>
+          <button class="botao-icone excluir" onclick="excluirContato(${c.id})" title="Excluir">✕</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.alternarLida = async function (id, lida) {
+  const data = await apiFetch('contato.php?id=' + id, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ lida })
+  });
+  if (data.sucesso) {
+    carregarContatos();
+  } else {
+    mostrarToast(data.erro, 'erro');
+  }
+};
+
+window.excluirContato = async function (id) {
+  if (!confirm('Tem certeza que deseja excluir essa mensagem?')) return;
+  const data = await apiFetch('contato.php?id=' + id, { method: 'DELETE' });
+  if (data.sucesso) {
+    mostrarToast(data.mensagem);
+    carregarContatos();
+  } else {
+    mostrarToast(data.erro, 'erro');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', carregarContatos);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,184 @@
+/* =========================================================================
+   BOARD POINT — Conta do cliente (botões da loja, login, cadastro, perfil)
+   Usa as variáveis de cor/fonte definidas em style.css.
+   ========================================================================= */
+
+[hidden] { display: none !important; }
+
+/* ---- Botões "Entrar | Cadastrar" no topo da loja ---- */
+.conta {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.conta__botao {
+  font-family: var(--fonte-corpo);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--branco);
+  background: rgba(11, 11, 11, 0.72);
+  border: 1px solid var(--linha);
+  border-radius: var(--radius);
+  padding: 9px 16px;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.conta__botao:hover { border-color: var(--amarelo); color: var(--amarelo); }
+
+.conta__botao--destaque {
+  background: var(--amarelo);
+  border-color: var(--amarelo);
+  color: var(--preto);
+}
+
+.conta__botao--destaque:hover { background: var(--amarelo-fundo); border-color: var(--amarelo-fundo); color: var(--preto); }
+
+@media (max-width: 480px) {
+  .conta { top: 10px; right: 10px; gap: 6px; }
+  .conta__botao { padding: 8px 12px; font-size: 0.72rem; }
+}
+
+/* ---- Páginas de login / cadastro / perfil ---- */
+.pagina-conta {
+  min-height: 100vh;
+  display: flex;
+  background: var(--preto);
+}
+
+.auth {
+  margin: auto;
+  width: 100%;
+  max-width: 460px;
+  padding: 32px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.auth__marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  font-family: var(--fonte-display);
+  font-size: 1.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.auth__marca img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--amarelo);
+}
+
+.auth__marca b { color: var(--amarelo); font-weight: inherit; }
+
+.auth__caixa {
+  width: 100%;
+  background: var(--preto-2);
+  border: 1px solid var(--linha);
+  border-top: 3px solid var(--amarelo);
+  border-radius: var(--radius);
+  padding: 28px 24px;
+}
+
+.auth__caixa h1 {
+  font-family: var(--fonte-display);
+  font-weight: 400;
+  font-size: 2rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+
+.auth__sub { color: var(--cinza); margin: 0 0 20px; font-size: 0.95rem; }
+
+.auth__troca { text-align: center; color: var(--cinza); margin: 20px 0 0; font-size: 0.92rem; }
+.auth__troca a { color: var(--amarelo); font-weight: 600; }
+
+.auth__voltar { color: var(--cinza); text-decoration: none; font-size: 0.9rem; }
+.auth__voltar:hover { color: var(--amarelo); }
+
+/* ---- Campos ---- */
+.campo { margin-bottom: 14px; }
+
+.campo label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cinza);
+  margin-bottom: 6px;
+}
+
+.campo__entrada {
+  width: 100%;
+  background: var(--preto);
+  border: 1px solid var(--linha);
+  border-radius: var(--radius);
+  color: var(--branco);
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.campo__entrada:focus { outline: 2px solid var(--amarelo); outline-offset: 1px; border-color: var(--amarelo); }
+.campo__entrada--erro { border-color: #ff6b6b; }
+.campo__entrada:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.campo__erro { display: block; min-height: 1.1em; margin-top: 5px; color: #ff8a8a; font-size: 0.82rem; }
+.campo__dica { display: block; margin-top: 5px; color: var(--cinza); font-size: 0.82rem; }
+
+/* ---- Botões e avisos ---- */
+.auth__botao {
+  width: 100%;
+  margin-top: 6px;
+  padding: 13px 16px;
+  background: var(--amarelo);
+  color: var(--preto);
+  border: 0;
+  border-radius: var(--radius);
+  font-family: var(--fonte-corpo);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.auth__botao:hover { background: var(--amarelo-fundo); }
+.auth__botao:disabled { opacity: 0.55; cursor: wait; }
+
+.auth__botao--secundario {
+  background: transparent;
+  color: var(--branco);
+  border: 1px solid var(--linha);
+}
+
+.auth__botao--secundario:hover { background: transparent; border-color: var(--amarelo); color: var(--amarelo); }
+
+.alerta {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  border-left: 3px solid;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+}
+
+.alerta--erro { background: rgba(255, 107, 107, 0.1); border-color: #ff6b6b; color: #ffb0b0; }
+.alerta--sucesso { background: rgba(111, 220, 140, 0.1); border-color: #6fdc8c; color: #b6f0c4; }

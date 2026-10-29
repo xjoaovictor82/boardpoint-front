@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedidos — Board Point Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+<style>
+  .status-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .status-pill.aguardando_pagamento { background: #3a2f0b; color: #e8c547; }
+  .status-pill.pago { background: #0f3a1f; color: #4ade80; }
+  .status-pill.cancelado { background: #3a0f0f; color: #f87171; }
+
+  .linha-pedido { cursor: pointer; }
+  .linha-pedido:hover { background: var(--preto-3); }
+
+  .detalhe-pedido {
+    display: none;
+    background: var(--preto);
+    padding: 14px 18px;
+  }
+  .detalhe-pedido.aberto { display: table-row; }
+  .detalhe-pedido td { padding: 12px 18px; }
+  .detalhe-itens { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .detalhe-itens td { padding: 6px 0; border-bottom: 1px dashed var(--linha); color: var(--cinza); }
+
+  .acoes-pedido { display: flex; gap: 8px; margin-top: 12px; }
+  .acoes-pedido button {
+    border: 1px solid var(--linha);
+    background: none;
+    color: var(--branco);
+    padding: 7px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .acoes-pedido button.confirmar:hover { border-color: #4ade80; color: #4ade80; }
+  .acoes-pedido button.cancelar:hover { border-color: #f87171; color: #f87171; }
+</style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <div id="sidebarAdmin" data-ativo="pedidos"></div>
+
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Pedidos</h1>
+    </div>
+
+    <div class="painel">
+      <div class="painel-cabecalho">
+        <h2>Pedidos recebidos</h2>
+        <span id="contagemPedidos" style="color: var(--cinza); font-size: 0.85rem;"></span>
+      </div>
+      <table class="tabela-admin table table-dark table-hover align-middle">
+        <thead>
+          <tr>
+            <th style="width:110px">Código</th>
+            <th style="width:110px">Data</th>
+            <th>Cliente</th>
+            <th style="width:90px">Total</th>
+            <th style="width:130px">Status</th>
+          </tr>
+        </thead>
+        <tbody id="corpoPedidos">
+          <tr><td colspan="5" class="estado-vazio">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/template-sidebar.js"></script>
+<script src="../assets/js/comum.js"></script>
+<script>
+let pedidos = [];
+let abertoId = null;
+
+function formatarData(iso) {
+  const d = new Date(iso.replace(' ', 'T'));
+  return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+}
+function formatarPreco(v) {
+  return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+function escaparHtml(texto) {
+  const div = document.createElement('div');
+  div.textContent = texto;
+  return div.innerHTML;
+}
+function rotuloStatus(status) {
+  return { aguardando_pagamento: 'Aguardando PIX', pago: 'Pago', cancelado: 'Cancelado' }[status] || status;
+}
+
+async function carregarPedidos() {
+  const data = await apiFetch('pedidos.php');
+  if (!data.sucesso) {
+    mostrarToast(data.erro, 'erro');
+    return;
+  }
+  pedidos = data.dados;
+  renderizarTabela();
+}
+
+function renderizarTabela() {
+  const corpo = document.getElementById('corpoPedidos');
+  const contagem = document.getElementById('contagemPedidos');
+
+  contagem.textContent = pedidos.length === 1 ? '1 pedido' : pedidos.length + ' pedidos';
+
+  if (pedidos.length === 0) {
+    corpo.innerHTML = '<tr><td colspan="5" class="estado-vazio">Nenhum pedido recebido ainda.</td></tr>';
+    return;
+  }
+
+  corpo.innerHTML = pedidos.map(p => `
+    <tr class="linha-pedido" onclick="alternarDetalhe(${p.id})">
+      <td><code>${p.codigo}</code></td>
+      <td style="font-size:0.8rem;">${formatarData(p.criado_em)}</td>
+      <td>${escaparHtml(p.cliente_nome)}</td>
+      <td>${formatarPreco(p.total)}</td>
+      <td><span class="status-pill ${p.status}">${rotuloStatus(p.status)}</span></td>
+    </tr>
+    <tr class="detalhe-pedido ${abertoId === p.id ? 'aberto' : ''}" id="detalhe-${p.id}">
+      <td colspan="5">
+        <p style="margin:0 0 8px; font-size:13px; color:var(--cinza);">
+          Telefone: ${escaparHtml(p.cliente_telefone)}
+          ${p.cliente_email ? ' · E-mail: ' + escaparHtml(p.cliente_email) : ''}
+        </p>
+        <table class="detalhe-itens">
+          ${p.itens.map(it => `
+            <tr>
+              <td>${it.quantidade}× ${escaparHtml(it.produto_nome)}</td>
+              <td style="text-align:right;">${formatarPreco(it.preco_unitario * it.quantidade)}</td>
+            </tr>
+          `).join('')}
+        </table>
+        ${p.status === 'aguardando_pagamento' ? `
+          <div class="acoes-pedido">
+            <button class="confirmar" onclick="event.stopPropagation(); mudarStatus(${p.id}, 'pago')">✓ Confirmar pagamento</button>
+            <button class="cancelar" onclick="event.stopPropagation(); mudarStatus(${p.id}, 'cancelado')">✕ Cancelar pedido</button>
+          </div>
+        ` : ''}
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.alternarDetalhe = function (id) {
+  abertoId = abertoId === id ? null : id;
+  renderizarTabela();
+};
+
+window.mudarStatus = async function (id, status) {
+  const mensagemConfirmacao = status === 'pago'
+    ? 'Confirma que o PIX caiu na conta? Isso vai abater o estoque dos produtos.'
+    : 'Cancelar este pedido?';
+  if (!confirm(mensagemConfirmacao)) return;
+
+  const data = await apiFetch('pedidos.php?id=' + id, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status })
+  });
+
+  if (data.sucesso) {
+    mostrarToast('Pedido atualizado.');
+    carregarPedidos();
+  } else {
+    mostrarToast(data.erro, 'erro');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', carregarPedidos);
+</script>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard — Board Point Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <div id="sidebarAdmin" data-ativo="dashboard"></div>
+
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Dashboard</h1>
+    </div>
+
+    <div class="grade-stats" id="gradeStats">
+      <div class="card-stat"><div class="rotulo">Total de produtos</div><div class="valor">—</div></div>
+      <div class="card-stat"><div class="rotulo">Categorias</div><div class="valor">—</div></div>
+      <div class="card-stat"><div class="rotulo">Com preço definido</div><div class="valor">—</div></div>
+      <div class="card-stat"><div class="rotulo">Sem estoque</div><div class="valor">—</div></div>
+    </div>
+
+    <!-- Métricas calculadas em TypeScript (dashboard.ts) a partir do
+         array bruto de produtos, não vêm prontas do banco. -->
+    <div class="grade-stats" id="gradeStatsCalculadas">
+      <div class="card-stat"><div class="rotulo">Faturamento potencial (estoque × preço)</div><div class="valor" id="faturamentoPotencial">—</div></div>
+      <div class="card-stat"><div class="rotulo">Preço médio</div><div class="valor" id="precoMedio">—</div></div>
+      <div class="card-stat"><div class="rotulo">Produto com mais estoque</div><div class="valor" id="produtoDestaque">—</div></div>
+      <div class="card-stat"><div class="rotulo">Categoria com mais produtos</div><div class="valor" id="categoriaDestaque">—</div></div>
+    </div>
+
+    <div class="painel">
+      <div class="painel-cabecalho">
+        <h2>Produtos por categoria</h2>
+      </div>
+      <table class="tabela-admin table table-dark table-hover align-middle">
+        <thead>
+          <tr><th>Categoria</th><th>Produtos cadastrados</th></tr>
+        </thead>
+        <tbody id="corpoCategorias">
+          <tr><td colspan="2" class="estado-vazio">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="painel">
+      <div class="painel-cabecalho">
+        <h2>Estoque crítico (3 unidades ou menos)</h2>
+      </div>
+      <ul id="listaEstoqueCritico" class="lista-admin">
+        <li class="estado-vazio">Carregando...</li>
+      </ul>
+    </div>
+  </main>
+</div>
+
+<script src="../assets/js/template-sidebar.js"></script>
+<script src="../assets/js/comum.js"></script>
+<!-- dashboard.js é compilado de ts/dashboard.ts (módulo ES): busca os
+     produtos brutos na API e calcula tudo (reduce/filter/map) aqui. -->
+<script type="module" src="../../js/dashboard.js"></script>
+
+</body>
+</html>

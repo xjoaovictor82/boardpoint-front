@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Produtos — Board Point Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <div id="sidebarAdmin" data-ativo="produtos"></div>
+
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Produtos</h1>
+    </div>
+
+    <div class="painel">
+      <div class="painel-cabecalho">
+        <h2>Todos os produtos</h2>
+        <div class="controles-tabela">
+          <input type="search" id="campoBusca" class="form-control" placeholder="Buscar por nome...">
+          <select id="filtroCategoria" class="form-select">
+            <option value="todos">Todas as categorias</option>
+          </select>
+          <button class="botao-novo" id="botaoNovoProduto">+ Novo produto</button>
+        </div>
+      </div>
+      <table class="tabela-admin table table-dark table-hover align-middle">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Nome</th>
+            <th>Categoria</th>
+            <th>Preço</th>
+            <th>Estoque</th>
+            <th style="width:100px">Ações</th>
+          </tr>
+        </thead>
+        <tbody id="corpoProdutos">
+          <tr><td colspan="6" class="estado-vazio">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- Modal criar/editar -->
+<div class="modal-fundo" id="modalProduto">
+  <div class="modal-caixa">
+    <h3 id="tituloModal">Novo produto</h3>
+    <form id="formProduto">
+      <input type="hidden" id="produtoId">
+
+      <div class="campo-grupo">
+        <label for="produtoNome">Nome</label>
+        <input type="text" id="produtoNome" class="form-control" required placeholder="Ex: Tênis Nike — Modelo 3">
+      </div>
+
+      <div class="campo-grupo">
+        <label for="produtoCategoria">Categoria</label>
+        <select id="produtoCategoria" class="form-select" required></select>
+      </div>
+
+      <div class="campo-grupo">
+        <label for="produtoPreco">Preço (deixe vazio para "Consulte o valor")</label>
+        <input type="number" id="produtoPreco" class="form-control" step="0.01" min="0" placeholder="Ex: 199.90">
+      </div>
+
+      <div class="campo-grupo">
+        <label for="produtoEstoque">Estoque</label>
+        <input type="number" id="produtoEstoque" class="form-control" min="0" value="0" required>
+      </div>
+
+      <div class="campo-grupo">
+        <label for="produtoImagem">Imagem <span id="imagemObrigatoria">(obrigatória)</span></label>
+        <input type="file" id="produtoImagem" class="form-control" accept="image/jpeg,image/png,image/webp">
+        <img id="previewImagem" class="preview-imagem" alt="Pré-visualização">
+      </div>
+
+      <div class="modal-acoes">
+        <button type="button" class="botao-secundario" id="botaoCancelarProduto">Cancelar</button>
+        <button type="submit" class="botao-primario btn" id="botaoSalvarProduto">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../assets/js/template-sidebar.js"></script>
+<script src="../assets/js/comum.js"></script>
+<script>
+let categorias = [];
+let produtos = [];
+let termoBusca = '';
+let categoriaFiltro = 'todos';
+let debounceBusca;
+
+function formatarPreco(preco) {
+  if (preco === null || preco === undefined) return null;
+  return preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+async function carregarCategorias() {
+  const data = await apiFetch('categorias.php');
+  if (!data.sucesso) return;
+  categorias = data.dados;
+
+  const selectFiltro = document.getElementById('filtroCategoria');
+  const selectModal = document.getElementById('produtoCategoria');
+
+  selectFiltro.innerHTML = '<option value="todos">Todas as categorias</option>' +
+    categorias.map(c => `<option value="${c.slug}">${c.nome}</option>`).join('');
+
+  selectModal.innerHTML = categorias.map(c => `<option value="${c.id}">${c.nome}</option>`).join('');
+}
+
+async function carregarProdutos() {
+  const params = new URLSearchParams({ busca: termoBusca, categoria: categoriaFiltro, por_pagina: 200 });
+  const data = await apiFetch('produtos.php?' + params.toString());
+  if (!data.sucesso) {
+    mostrarToast(data.erro, 'erro');
+    return;
+  }
+  produtos = data.dados.produtos;
+  renderizarTabela();
+}
+
+function renderizarTabela() {
+  const corpo = document.getElementById('corpoProdutos');
+  if (produtos.length === 0) {
+    corpo.innerHTML = '<tr><td colspan="6" class="estado-vazio">Nenhum produto encontrado.</td></tr>';
+    return;
+  }
+  corpo.innerHTML = produtos.map(p => {
+    const precoFmt = formatarPreco(p.preco);
+    const badgeClasse = p.estoque === 0 ? 'badge-estoque zero' : 'badge-estoque';
+    return `
+      <tr>
+        <td><img class="miniatura" src="../../${p.imagem}" alt="${p.nome}" onerror="this.style.opacity=0.2"></td>
+        <td>${p.nome}</td>
+        <td>${p.categoria_nome}</td>
+        <td>${precoFmt ? `<span class="tag-preco">${precoFmt}</span>` : '<span class="tag-consulta">Consulte o valor</span>'}</td>
+        <td><span class="${badgeClasse}">${p.estoque}</span></td>
+        <td>
+          <div class="acoes-linha">
+            <button class="botao-icone" onclick="abrirEdicao(${p.id})" title="Editar">✎</button>
+            <button class="botao-icone excluir" onclick="excluirProduto(${p.id})" title="Excluir">✕</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+document.getElementById('campoBusca').addEventListener('input', (e) => {
+  clearTimeout(debounceBusca);
+  debounceBusca = setTimeout(() => {
+    termoBusca = e.target.value;
+    carregarProdutos();
+  }, 300);
+});
+
+document.getElementById('filtroCategoria').addEventListener('change', (e) => {
+  categoriaFiltro = e.target.value;
+  carregarProdutos();
+});
+
+function abrirModal(titulo) {
+  document.getElementById('tituloModal').textContent = titulo;
+  document.getElementById('modalProduto').classList.add('aberto');
+}
+function fecharModal() {
+  document.getElementById('modalProduto').classList.remove('aberto');
+  document.getElementById('formProduto').reset();
+  document.getElementById('produtoId').value = '';
+  document.getElementById('previewImagem').classList.remove('ativo');
+  document.getElementById('imagemObrigatoria').style.display = 'inline';
+}
+
+document.getElementById('botaoNovoProduto').addEventListener('click', () => {
+  abrirModal('Novo produto');
+});
+document.getElementById('botaoCancelarProduto').addEventListener('click', fecharModal);
+
+document.getElementById('produtoImagem').addEventListener('change', (e) => {
+  const arquivo = e.target.files[0];
+  const preview = document.getElementById('previewImagem');
+  if (!arquivo) { preview.classList.remove('ativo'); return; }
+  preview.src = URL.createObjectURL(arquivo);
+  preview.classList.add('ativo');
+});
+
+window.abrirEdicao = function (id) {
+  const p = produtos.find(p => p.id === id);
+  if (!p) return;
+  document.getElementById('produtoId').value = p.id;
+  document.getElementById('produtoNome').value = p.nome;
+  document.getElementById('produtoCategoria').value = p.categoria_id;
+  document.getElementById('produtoPreco').value = p.preco ?? '';
+  document.getElementById('produtoEstoque').value = p.estoque;
+  document.getElementById('imagemObrigatoria').style.display = 'none';
+
+  const preview = document.getElementById('previewImagem');
+  preview.src = '../../' + p.imagem;
+  preview.classList.add('ativo');
+
+  abrirModal('Editar produto');
+};
+
+window.excluirProduto = async function (id) {
+  if (!confirm('Tem certeza que deseja excluir esse produto?')) return;
+  const data = await apiFetch('produtos.php?id=' + id, { method: 'DELETE' });
+  if (data.sucesso) {
+    mostrarToast(data.mensagem);
+    carregarProdutos();
+  } else {
+    mostrarToast(data.erro, 'erro');
+  }
+};
+
+document.getElementById('formProduto').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('produtoId').value;
+  const arquivoImagem = document.getElementById('produtoImagem').files[0];
+
+  if (!id && !arquivoImagem) {
+    mostrarToast('A imagem é obrigatória para um novo produto.', 'erro');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('categoria_id', document.getElementById('produtoCategoria').value);
+  formData.append('nome', document.getElementById('produtoNome').value.trim());
+  formData.append('preco', document.getElementById('produtoPreco').value);
+  formData.append('estoque', document.getElementById('produtoEstoque').value);
+  if (arquivoImagem) formData.append('imagem', arquivoImagem);
+
+  const botao = document.getElementById('botaoSalvarProduto');
+  botao.disabled = true;
+
+  const url = id ? `produtos.php?id=${id}&_method=PUT` : 'produtos.php';
+  const data = await apiFetch(url, { method: 'POST', body: formData });
+
+  botao.disabled = false;
+
+  if (data.sucesso) {
+    mostrarToast(data.mensagem);
+    fecharModal();
+    carregarProdutos();
+  } else {
+    mostrarToast(data.erro, 'erro');
+  }
+});
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await carregarCategorias();
+  await carregarProdutos();
+});
+</script>
+
+</body>
+</html>

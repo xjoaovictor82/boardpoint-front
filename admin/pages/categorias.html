@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Categorias — Board Point Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <div id="sidebarAdmin" data-ativo="categorias"></div>
+
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Categorias</h1>
+    </div>
+
+    <div class="painel">
+      <div class="painel-cabecalho">
+        <h2>Todas as categorias</h2>
+        <button class="botao-novo" id="botaoNovaCategoria">+ Nova categoria</button>
+      </div>
+      <table class="tabela-admin table table-dark table-hover align-middle">
+        <thead>
+          <tr><th>Nome</th><th>Slug</th><th style="width:100px">Ações</th></tr>
+        </thead>
+        <tbody id="corpoCategorias">
+          <tr><td colspan="3" class="estado-vazio">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<!-- Modal criar/editar -->
+<div class="modal-fundo" id="modalCategoria">
+  <div class="modal-caixa">
+    <h3 id="tituloModal">Nova categoria</h3>
+    <form id="formCategoria">
+      <input type="hidden" id="categoriaId">
+      <div class="campo-grupo">
+        <label for="categoriaNome">Nome</label>
+        <input type="text" id="categoriaNome" class="form-control" required placeholder="Ex: Bonés">
+      </div>
+      <div class="campo-grupo">
+        <label for="categoriaSlug">Slug (identificador, sem espaços)</label>
+        <input type="text" id="categoriaSlug" class="form-control" required placeholder="Ex: bones">
+      </div>
+      <div class="modal-acoes">
+        <button type="button" class="botao-secundario" id="botaoCancelarCategoria">Cancelar</button>
+        <button type="submit" class="botao-primario btn" id="botaoSalvarCategoria">Salvar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="../assets/js/template-sidebar.js"></script>
+<script src="../assets/js/comum.js"></script>
+<script>
+let categorias = [];
+
+function slugificar(texto) {
+  return texto
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+async function carregarCategorias() {
+  const data = await apiFetch('categorias.php');
+  if (!data.sucesso) {
+    mostrarToast(data.erro, 'erro');
+    return;
+  }
+  categorias = data.dados;
+  renderizarTabela();
+}
+
+function renderizarTabela() {
+  const corpo = document.getElementById('corpoCategorias');
+  if (categorias.length === 0) {
+    corpo.innerHTML = '<tr><td colspan="3" class="estado-vazio">Nenhuma categoria cadastrada.</td></tr>';
+    return;
+  }
+  corpo.innerHTML = categorias.map(c => `
+    <tr>
+      <td>${c.nome}</td>
+      <td><code>${c.slug}</code></td>
+      <td>
+        <div class="acoes-linha">
+          <button class="botao-icone" onclick="abrirEdicao(${c.id})" title="Editar">✎</button>
+          <button class="botao-icone excluir" onclick="excluirCategoria(${c.id})" title="Excluir">✕</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function abrirModal(titulo) {
+  document.getElementById('tituloModal').textContent = titulo;
+  document.getElementById('modalCategoria').classList.add('aberto');
+}
+function fecharModal() {
+  document.getElementById('modalCategoria').classList.remove('aberto');
+  document.getElementById('formCategoria').reset();
+  document.getElementById('categoriaId').value = '';
+}
+
+document.getElementById('botaoNovaCategoria').addEventListener('click', () => {
+  abrirModal('Nova categoria');
+});
+document.getElementById('botaoCancelarCategoria').addEventListener('click', fecharModal);
+
+document.getElementById('categoriaNome').addEventListener('input', (e) => {
+  if (!document.getElementById('categoriaId').value) {
+    document.getElementById('categoriaSlug').value = slugificar(e.target.value);
+  }
+});
+
+window.abrirEdicao = function (id) {
+  const cat = categorias.find(c => c.id === id);
+  if (!cat) return;
+  document.getElementById('categoriaId').value = cat.id;
+  document.getElementById('categoriaNome').value = cat.nome;
+  document.getElementById('categoriaSlug').value = cat.slug;
+  abrirModal('Editar categoria');
+};
+
+window.excluirCategoria = async function (id) {
+  if (!confirm('Tem certeza que deseja excluir essa categoria?')) return;
+  const data = await apiFetch('categorias.php?id=' + id, { method: 'DELETE' });
+  if (data.sucesso) {
+    mostrarToast(data.mensagem);
+    carregarCategorias();
+  } else {
+    mostrarToast(data.erro, 'erro');
+  }
+};
+
+document.getElementById('formCategoria').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('categoriaId').value;
+  const nome = document.getElementById('categoriaNome').value.trim();
+  const slug = document.getElementById('categoriaSlug').value.trim();
+
+  const botao = document.getElementById('botaoSalvarCategoria');
+  botao.disabled = true;
+
+  let data;
+  if (id) {
+    data = await apiFetch('categorias.php?id=' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, slug })
+    });
+  } else {
+    data = await apiFetch('categorias.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome, slug })
+    });
+  }
+
+  botao.disabled = false;
+
+  if (data.sucesso) {
+    mostrarToast(data.mensagem);
+    fecharModal();
+    carregarCategorias();
+  } else {
+    mostrarToast(data.erro, 'erro');
+  }
+});
+
+document.addEventListener('DOMContentLoaded', carregarCategorias);
+</script>
+
+</body>
+</html>
