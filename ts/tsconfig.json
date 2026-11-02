@@ -11,5 +11,5 @@
     "sourceMap": false,
     "removeComments": false
   },
-  "include": ["main.ts", "dashboard.ts", "cliente/pagina*.ts", "tipos/qrcode.d.ts"]
+  "include": ["main.ts", "dashboard.ts", "cliente/pagina*.ts", "admin/pagina*.ts", "tipos/qrcode.d.ts"]
 }

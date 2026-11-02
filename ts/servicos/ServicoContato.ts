@@ -8,6 +8,6 @@ export class ServicoContato {
   }
 
   async enviar(contato: DadosContato): Promise<void> {
-    await this.#cliente.enviarJson<null>("contato.php", contato);
+    await this.#cliente.enviarJson<null>("publico/contato.php", contato);
   }
 }

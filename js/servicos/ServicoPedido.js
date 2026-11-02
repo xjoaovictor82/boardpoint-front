@@ -11,7 +11,7 @@ export class ServicoPedido {
             produto_id: item.produtoId,
             quantidade: item.quantidade,
         }));
-        const pedido = await this.#cliente.enviarJson("pedidos.php?acao=criar", {
+        const pedido = await this.#cliente.enviarJson("publico/checkout.php", {
             ...cliente,
             itens,
         });

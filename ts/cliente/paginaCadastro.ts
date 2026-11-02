@@ -1,10 +1,10 @@
 import { ClienteApi } from "../repositorios/ClienteApi.js";
 import { obterElemento } from "../utilitarios/dom.js";
-import { comBotaoOcupado, esconderAlerta, limparErroAoDigitar, mostrarAlerta, mostrarErrosCampos } from "./formulario.js";
+import { comBotaoOcupado, definirErroCampo, esconderAlerta, limparErroAoDigitar, mostrarAlerta, mostrarErrosCampos } from "./formulario.js";
 import { mensagemAmigavel } from "./mensagens.js";
 import { ServicoConta } from "./ServicoConta.js";
 import { sessao } from "./SessaoUsuario.js";
-import { errosConta, formatarCpf, type CamposConta } from "./validacoes.js";
+import { errosConta, formatarCpf, validarCpf, type CamposConta } from "./validacoes.js";
 
 const CAMPOS = ["nome", "email", "cpf", "senha", "confirmarSenha"];
 
@@ -26,6 +26,11 @@ function iniciar(): void {
   limparErroAoDigitar(CAMPOS);
   campoCpf.addEventListener("input", () => {
     campoCpf.value = formatarCpf(campoCpf.value);
+  });
+  // Valida o CPF assim que a pessoa sai do campo (campo vazio só reclama ao enviar).
+  campoCpf.addEventListener("blur", () => {
+    if (campoCpf.value.trim() === "") return;
+    definirErroCampo("cpf", validarCpf(campoCpf.value) ? "" : "CPF inválido. Confira os números.");
   });
 
   formulario.addEventListener("submit", (evento) => {

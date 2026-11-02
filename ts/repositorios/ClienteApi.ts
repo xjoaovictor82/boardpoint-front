@@ -12,7 +12,11 @@ export class ClienteApi implements ClienteHttp {
   readonly #aoNaoAutenticado: (() => void) | undefined;
   readonly #chaveToken: string;
 
-  constructor(base: string, aoNaoAutenticado?: () => void, chaveToken: string = CHAVE_TOKEN_CLIENTE) {
+  constructor(
+    base: string,
+    aoNaoAutenticado?: () => void,
+    chaveToken: string = CHAVE_TOKEN_CLIENTE,
+  ) {
     this.#base = base;
     this.#aoNaoAutenticado = aoNaoAutenticado;
     this.#chaveToken = chaveToken;
@@ -28,6 +32,15 @@ export class ClienteApi implements ClienteHttp {
 
   atualizarJson<T>(caminho: string, corpo: unknown): Promise<T> {
     return this.#requisitar<T>(caminho, this.#comCorpoJson("PUT", corpo));
+  }
+
+  excluir<T>(caminho: string): Promise<T> {
+    return this.#requisitar<T>(caminho, { method: "DELETE" });
+  }
+
+  /** Upload de arquivo (multipart). Sem Content-Type: o navegador monta o limite sozinho. */
+  enviarFormulario<T>(caminho: string, formulario: FormData): Promise<T> {
+    return this.#requisitar<T>(caminho, { method: "POST", body: formulario });
   }
 
   #comCorpoJson(metodo: string, corpo: unknown): RequestInit {
@@ -70,7 +83,10 @@ export class ClienteApi implements ClienteHttp {
     try {
       corpo = (await resposta.json()) as RespostaApi<T>;
     } catch {
-      throw new ErroApi("O servidor devolveu uma resposta inesperada.", resposta.status);
+      throw new ErroApi(
+        "O servidor devolveu uma resposta inesperada.",
+        resposta.status,
+      );
     }
 
     if (resposta.status === 401) {
