@@ -39,7 +39,7 @@ export class RepositorioProdutos
   }
 
   async #listar(params: URLSearchParams): Promise<Produto[]> {
-    const dados = await this.cliente.obter<RespostaProdutos>("produtos.php?" + params.toString());
+    const dados = await this.cliente.obter<RespostaProdutos>("publico/produtos.php?" + params.toString());
     return this.converterLista(dados.produtos);
   }
 }

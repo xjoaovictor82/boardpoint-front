@@ -5,7 +5,7 @@
    Compilado para js/dashboard.js com `tsc -p ts`.
    ========================================================================= */
 
-import { ClienteApi } from "./repositorios/ClienteApi.js";
+import { iniciarPaginaAdmin } from "./admin/nucleo/iniciarPaginaAdmin.js";
 import { RepositorioProdutos } from "./repositorios/RepositorioProdutos.js";
 import { ServicoMetricas } from "./servicos/ServicoMetricas.js";
 import {
@@ -25,10 +25,11 @@ import { PainelDashboard } from "./ui/PainelDashboard.js";
 const LIMITE_ESTOQUE_CRITICO = 3;
 
 async function iniciar(): Promise<void> {
-  const api = new ClienteApi("../api/", () => {
-    window.location.href = "../login.html";
-  });
-  const repositorio = new RepositorioProdutos(api);
+  // Monta a sidebar, exige login e devolve o cliente da API com o token do admin.
+  const contexto = await iniciarPaginaAdmin();
+  if (contexto === null) return;
+
+  const repositorio = new RepositorioProdutos(contexto.api);
   const servico = new ServicoMetricas({
     total: new TotalProdutos(),
     comPreco: new ProdutosComPreco(),

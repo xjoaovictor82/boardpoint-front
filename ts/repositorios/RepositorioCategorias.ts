@@ -15,7 +15,7 @@ export class RepositorioCategorias
   }
 
   async listar(): Promise<Categoria[]> {
-    const dtos = await this.cliente.obter<CategoriaDto[]>("categorias.php");
+    const dtos = await this.cliente.obter<CategoriaDto[]>("publico/categorias.php");
     return this.converterLista(dtos);
   }
 }

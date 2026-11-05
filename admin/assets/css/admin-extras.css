@@ -1,0 +1,55 @@
+/* ==========================================================================
+   admin-extras.css — estilos dos componentes novos do painel (TypeScript):
+   paginação, status de pedido, detalhe de pedido e itens do formulário.
+   ========================================================================== */
+
+.paginacao { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 16px 0 4px; }
+.paginacao-info { color: var(--cinza); font-size: 13px; }
+.paginacao .botao-secundario:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ---- Pedidos (estilos que estavam inline em pedidos.html) ---- */
+  .status-pill {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .status-pill.aguardando_pagamento { background: #3a2f0b; color: #e8c547; }
+  .status-pill.pago { background: #0f3a1f; color: #4ade80; }
+  .status-pill.cancelado { background: #3a0f0f; color: #f87171; }
+
+  .linha-pedido { cursor: pointer; }
+  .linha-pedido:hover { background: var(--preto-3); }
+
+  .detalhe-pedido {
+    display: none;
+    background: var(--preto);
+    padding: 14px 18px;
+  }
+  .detalhe-pedido.aberto { display: table-row; }
+  .detalhe-pedido td { padding: 12px 18px; }
+  .detalhe-itens { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .detalhe-itens td { padding: 6px 0; border-bottom: 1px dashed var(--linha); color: var(--cinza); }
+
+  .acoes-pedido { display: flex; gap: 8px; margin-top: 12px; }
+  .acoes-pedido button {
+    border: 1px solid var(--linha);
+    background: none;
+    color: var(--branco);
+    padding: 7px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .acoes-pedido button.confirmar:hover { border-color: #4ade80; color: #4ade80; }
+  .acoes-pedido button.cancelar:hover { border-color: #f87171; color: #f87171; }
+.acoes-pedido button.editar:hover { border-color: var(--amarelo); color: var(--amarelo); }
+.detalhe-contato { margin: 0 0 8px; font-size: 13px; color: var(--cinza); }
+
+/* ---- Formulário de pedido: linhas de itens ---- */
+.item-pedido-linha { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+.item-pedido-linha select { flex: 1; }
+.total-pedido { margin-top: 14px; font-family: var(--fonte-mono); color: var(--amarelo); font-size: 18px; }

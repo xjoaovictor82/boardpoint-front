@@ -25,13 +25,14 @@
 
         <form id="form-login">
           <div class="campo-grupo mb-3">
-            <label for="login-usuario">Usuário</label>
+            <label for="login-email">E-mail</label>
             <input
-              type="text"
-              id="login-usuario"
-              name="usuario"
+              type="email"
+              id="login-email"
+              name="email"
               class="form-control"
-              autocomplete="username"
+              autocomplete="email"
+              placeholder="admin@boardpoint.com"
               required
             />
           </div>
@@ -61,42 +62,6 @@
       </div>
     </div>
 
-    <script>
-      const form = document.getElementById("form-login");
-      const msg = document.getElementById("mensagem-status");
-      const botao = document.getElementById("botaoEntrar");
-
-      function mostrarErro(texto) {
-        msg.textContent = texto;
-        msg.classList.add("ativo");
-      }
-
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        msg.classList.remove("ativo");
-        botao.disabled = true;
-        try {
-          const resp = await fetch("api/auth.php?acao=login", {
-            method: "POST",
-            credentials: "same-origin",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              usuario: document.getElementById("login-usuario").value.trim(),
-              senha: document.getElementById("login-senha").value,
-            }),
-          });
-          const data = await resp.json();
-          if (!resp.ok || !data.sucesso) {
-            mostrarErro(data.erro || "Não foi possível entrar.");
-            return;
-          }
-          window.location.href = "pages/dashboard.html";
-        } catch {
-          mostrarErro("Erro de conexão com o servidor.");
-        } finally {
-          botao.disabled = false;
-        }
-      });
-    </script>
+    <script type="module" src="../js/admin/paginaLoginAdmin.js"></script>
   </body>
 </html>

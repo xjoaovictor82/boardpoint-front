@@ -4,7 +4,7 @@
    às métricas (servicos/metricas/) e a exibição ao PainelDashboard.
    Compilado para js/dashboard.js com `tsc -p ts`.
    ========================================================================= */
-import { ClienteApi } from "./repositorios/ClienteApi.js";
+import { iniciarPaginaAdmin } from "./admin/nucleo/iniciarPaginaAdmin.js";
 import { RepositorioProdutos } from "./repositorios/RepositorioProdutos.js";
 import { ServicoMetricas } from "./servicos/ServicoMetricas.js";
 import { CategoriaDestaque, EstoqueCritico, FaturamentoPotencial, PrecoMedio, ProdutoDestaque, ProdutosComPreco, ProdutosPorCategoria, ProdutosSemEstoque, TotalProdutos, } from "./servicos/metricas/Metricas.js";
@@ -12,10 +12,11 @@ import { PainelDashboard } from "./ui/PainelDashboard.js";
 // Produtos com estoque até este valor (e maior que zero) entram no alerta de reposição.
 const LIMITE_ESTOQUE_CRITICO = 3;
 async function iniciar() {
-    const api = new ClienteApi("../api/", () => {
-        window.location.href = "../login.html";
-    });
-    const repositorio = new RepositorioProdutos(api);
+    // Monta a sidebar, exige login e devolve o cliente da API com o token do admin.
+    const contexto = await iniciarPaginaAdmin();
+    if (contexto === null)
+        return;
+    const repositorio = new RepositorioProdutos(contexto.api);
     const servico = new ServicoMetricas({
         total: new TotalProdutos(),
         comPreco: new ProdutosComPreco(),

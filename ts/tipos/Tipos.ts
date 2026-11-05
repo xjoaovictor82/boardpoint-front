@@ -107,6 +107,8 @@ export interface ClienteHttp {
   obter<T>(caminho: string): Promise<T>;
   enviarJson<T>(caminho: string, corpo: unknown): Promise<T>;
   atualizarJson<T>(caminho: string, corpo: unknown): Promise<T>;
+  excluir<T>(caminho: string): Promise<T>;
+  enviarFormulario<T>(caminho: string, corpo: FormData): Promise<T>;
 }
 
 export interface Armazenamento<T> {

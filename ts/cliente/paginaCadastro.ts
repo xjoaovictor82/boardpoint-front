@@ -1,10 +1,10 @@
 import { ClienteApi } from "../repositorios/ClienteApi.js";
 import { obterElemento } from "../utilitarios/dom.js";
-import { comBotaoOcupado, esconderAlerta, limparErroAoDigitar, mostrarAlerta, mostrarErrosCampos } from "./formulario.js";
+import { comBotaoOcupado, definirErroCampo, esconderAlerta, limparErroAoDigitar, mostrarAlerta, mostrarErrosCampos } from "./formulario.js";
 import { mensagemAmigavel } from "./mensagens.js";
 import { ServicoConta } from "./ServicoConta.js";
 import { sessao } from "./SessaoUsuario.js";
-import { errosConta, formatarCpf, type CamposConta } from "./validacoes.js";
+import { errosConta, formatarCpf, validarCpf, type CamposConta } from "./validacoes.js";
 
 const CAMPOS = ["nome", "email", "cpf", "senha", "confirmarSenha"];
 
@@ -18,14 +18,42 @@ function iniciar(): void {
     return;
   }
 
-  const servico = new ServicoConta(new ClienteApi("../admin/api/"), sessao);
+  const api = new ClienteApi("../admin/api/");
+  const servico = new ServicoConta(api, sessao);
   const formulario = obterElemento<HTMLFormElement>("formCadastro");
   const botao = obterElemento<HTMLButtonElement>("botaoCadastrar");
   const campoCpf = obterElemento<HTMLInputElement>("campo-cpf");
+  const botaoSugerir = obterElemento<HTMLButtonElement>("botaoSugerirSenha");
+  const campoSenha = obterElemento<HTMLInputElement>("campo-senha");
+  const campoConfirmar = obterElemento<HTMLInputElement>("campo-confirmarSenha");
 
   limparErroAoDigitar(CAMPOS);
   campoCpf.addEventListener("input", () => {
     campoCpf.value = formatarCpf(campoCpf.value);
+  });
+  // Valida o CPF assim que a pessoa sai do campo (campo vazio só reclama ao enviar).
+  campoCpf.addEventListener("blur", () => {
+    if (campoCpf.value.trim() === "") return;
+    definirErroCampo("cpf", validarCpf(campoCpf.value) ? "" : "CPF inválido. Confira os números.");
+  });
+
+  botaoSugerir.addEventListener("click", () => {
+    esconderAlerta();
+    void comBotaoOcupado(botaoSugerir, "Gerando...", async () => {
+      try {
+        const { senha } = await api.enviarJson<{ senha: string }>("clientes.php?acao=sugerir-senha", {});
+        // Mostra a senha para a pessoa guardar antes de criar a conta.
+        campoSenha.type = "text";
+        campoConfirmar.type = "text";
+        campoSenha.value = senha;
+        campoConfirmar.value = senha;
+        definirErroCampo("senha", "");
+        definirErroCampo("confirmarSenha", "");
+        mostrarAlerta("Senha sugerida preenchida. Guarde-a em um lugar seguro antes de criar a conta.", "sucesso");
+      } catch (erro) {
+        mostrarAlerta(mensagemAmigavel(erro, "cadastro"), "erro");
+      }
+    });
   });
 
   formulario.addEventListener("submit", (evento) => {

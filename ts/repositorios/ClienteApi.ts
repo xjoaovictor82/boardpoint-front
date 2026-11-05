@@ -30,6 +30,15 @@ export class ClienteApi implements ClienteHttp {
     return this.#requisitar<T>(caminho, this.#comCorpoJson("PUT", corpo));
   }
 
+  excluir<T>(caminho: string): Promise<T> {
+    return this.#requisitar<T>(caminho, { method: "DELETE" });
+  }
+
+  /** Envia multipart/form-data (upload de arquivo). O navegador define o Content-Type sozinho. */
+  enviarFormulario<T>(caminho: string, corpo: FormData): Promise<T> {
+    return this.#requisitar<T>(caminho, { method: "POST", body: corpo });
+  }
+
   #comCorpoJson(metodo: string, corpo: unknown): RequestInit {
     return {
       method: metodo,
