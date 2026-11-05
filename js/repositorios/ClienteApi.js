@@ -22,6 +22,7 @@ export class ClienteApi {
     atualizarJson(caminho, corpo) {
         return this.#requisitar(caminho, this.#comCorpoJson("PUT", corpo));
     }
+<<<<<<< HEAD
     excluir(caminho) {
         return this.#requisitar(caminho, { method: "DELETE" });
     }
@@ -29,6 +30,8 @@ export class ClienteApi {
     enviarFormulario(caminho, corpo) {
         return this.#requisitar(caminho, { method: "POST", body: corpo });
     }
+=======
+>>>>>>> ddce26904b425819d8fa0e0f0e7b2d1de7b7a08b
     #comCorpoJson(metodo, corpo) {
         return {
             method: metodo,

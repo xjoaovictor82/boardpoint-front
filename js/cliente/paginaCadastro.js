@@ -14,6 +14,7 @@ function iniciar() {
         window.location.replace("../index.html");
         return;
     }
+<<<<<<< HEAD
     const api = new ClienteApi("../admin/api/");
     const servico = new ServicoConta(api, sessao);
     const formulario = obterElemento("formCadastro");
@@ -22,6 +23,12 @@ function iniciar() {
   const botaoSugerir = obterElemento("botaoSugerirSenha");
   const campoSenha = obterElemento("campo-senha");
   const campoConfirmar = obterElemento("campo-confirmarSenha");
+=======
+    const servico = new ServicoConta(new ClienteApi("../admin/api/"), sessao);
+    const formulario = obterElemento("formCadastro");
+    const botao = obterElemento("botaoCadastrar");
+    const campoCpf = obterElemento("campo-cpf");
+>>>>>>> ddce26904b425819d8fa0e0f0e7b2d1de7b7a08b
     limparErroAoDigitar(CAMPOS);
     campoCpf.addEventListener("input", () => {
         campoCpf.value = formatarCpf(campoCpf.value);
@@ -32,6 +39,7 @@ function iniciar() {
             return;
         definirErroCampo("cpf", validarCpf(campoCpf.value) ? "" : "CPF inválido. Confira os números.");
     });
+<<<<<<< HEAD
   botaoSugerir.addEventListener("click", () => {
     esconderAlerta();
     void comBotaoOcupado(botaoSugerir, "Gerando...", async () => {
@@ -51,6 +59,8 @@ function iniciar() {
     });
   });
 
+=======
+>>>>>>> ddce26904b425819d8fa0e0f0e7b2d1de7b7a08b
     formulario.addEventListener("submit", (evento) => {
         evento.preventDefault();
         esconderAlerta();

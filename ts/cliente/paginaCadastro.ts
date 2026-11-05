@@ -36,6 +36,7 @@ function iniciar(): void {
     if (campoCpf.value.trim() === "") return;
     definirErroCampo("cpf", validarCpf(campoCpf.value) ? "" : "CPF inválido. Confira os números.");
   });
+<<<<<<< HEAD
 
   botaoSugerir.addEventListener("click", () => {
     esconderAlerta();
@@ -55,6 +56,8 @@ function iniciar(): void {
       }
     });
   });
+=======
+>>>>>>> ddce26904b425819d8fa0e0f0e7b2d1de7b7a08b
 
   formulario.addEventListener("submit", (evento) => {
     evento.preventDefault();
