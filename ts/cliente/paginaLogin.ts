@@ -2,6 +2,7 @@ import { ClienteApi } from "../repositorios/ClienteApi.js";
 import { obterElemento } from "../utilitarios/dom.js";
 import { comBotaoOcupado, esconderAlerta, limparErroAoDigitar, mostrarAlerta, mostrarErrosCampos } from "./formulario.js";
 import { mensagemAmigavel } from "./mensagens.js";
+import { ativarOlhosDeSenha } from "./olhoSenha.js";
 import { ServicoConta } from "./ServicoConta.js";
 import { sessao } from "./SessaoUsuario.js";
 import { errosLogin } from "./validacoes.js";
@@ -14,6 +15,8 @@ function iniciar(): void {
     window.location.replace("../index.html");
     return;
   }
+
+  ativarOlhosDeSenha();
 
   const servico = new ServicoConta(new ClienteApi("../admin/api/"), sessao);
   const formulario = obterElemento<HTMLFormElement>("formLogin");

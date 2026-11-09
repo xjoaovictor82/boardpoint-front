@@ -9,7 +9,8 @@
 .conta {
   position: absolute;
   top: 14px;
-  right: 14px;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 60;
   display: flex;
   align-items: center;
@@ -140,6 +141,39 @@
 .campo__entrada:focus { outline: 2px solid var(--amarelo); outline-offset: 1px; border-color: var(--amarelo); }
 .campo__entrada--erro { border-color: #ff6b6b; }
 .campo__entrada:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Olho de mostrar/ocultar senha */
+.campo__senha { position: relative; }
+.campo__senha .campo__entrada { padding-right: 48px; }
+.campo__olho {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 46px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 0;
+  color: var(--cinza);
+  cursor: pointer;
+}
+.campo__olho:hover, .campo__olho:focus-visible { color: var(--amarelo); outline: none; }
+.campo__olho svg { width: 20px; height: 20px; }
+
+/* Sugerir / copiar senha */
+.auth__sugestao { display: flex; gap: 8px; margin: -4px 0 14px; }
+.auth__sugestao [hidden] { display: none; }
+.auth__botao--secundario {
+  flex: 1;
+  width: auto;
+  margin: 0;
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+}
+.auth__botao--secundario:hover { color: var(--amarelo); background: transparent; }
 
 .campo__erro { display: block; min-height: 1.1em; margin-top: 5px; color: #ff8a8a; font-size: 0.82rem; }
 .campo__dica { display: block; margin-top: 5px; color: var(--cinza); font-size: 0.82rem; }

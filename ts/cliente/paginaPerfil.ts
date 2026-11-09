@@ -3,6 +3,7 @@ import { ClienteApi } from "../repositorios/ClienteApi.js";
 import { obterElemento } from "../utilitarios/dom.js";
 import { comBotaoOcupado, esconderAlerta, limparErroAoDigitar, mostrarAlerta, mostrarErrosCampos } from "./formulario.js";
 import { mensagemAmigavel } from "./mensagens.js";
+import { ativarOlhosDeSenha } from "./olhoSenha.js";
 import { ServicoConta, type Perfil } from "./ServicoConta.js";
 import { sessao } from "./SessaoUsuario.js";
 import { errosConta, formatarCpf, type CamposConta } from "./validacoes.js";
@@ -32,6 +33,8 @@ async function iniciar(): Promise<void> {
     voltarAoLogin();
     return;
   }
+
+  ativarOlhosDeSenha();
 
   const servico = new ServicoConta(new ClienteApi("../admin/api/", () => sessao.encerrar()), sessao);
   const formulario = obterElemento<HTMLFormElement>("formPerfil");

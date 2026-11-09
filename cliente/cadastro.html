@@ -45,6 +45,10 @@
         <small id="erro-senha" class="campo__erro"></small>
       </div>
       <small class="campo__dica" style="margin-top:-8px;margin-bottom:14px">Use maiúscula, minúscula, número e símbolo.</small>
+      <div class="auth__sugestao">
+        <button id="botaoSugerirSenha" class="auth__botao auth__botao--secundario" type="button">Sugerir uma senha forte</button>
+        <button id="botaoCopiarSenha" class="auth__botao auth__botao--secundario" type="button" hidden>Copiar senha</button>
+      </div>
       <div class="campo">
         <label for="campo-confirmarSenha">Confirme a senha</label>
         <input id="campo-confirmarSenha" class="campo__entrada" type="password" autocomplete="new-password" placeholder="Repita a senha" required>
