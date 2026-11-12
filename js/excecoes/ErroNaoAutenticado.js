@@ -1,7 +1,7 @@
 import { ErroApi } from "./ErroApi.js";
-/** Sessão do admin expirada (HTTP 401). */
+/** Login recusado ou sessão expirada (HTTP 401). */
 export class ErroNaoAutenticado extends ErroApi {
-    constructor() {
-        super("Não autenticado. Faça login novamente.", 401);
+    constructor(mensagem = "Não autenticado. Faça login novamente.") {
+        super(mensagem, 401);
     }
 }

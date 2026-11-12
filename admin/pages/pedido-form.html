@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pedido — Board Point Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+<link rel="stylesheet" href="../assets/css/admin.css">
+<link rel="stylesheet" href="../assets/css/admin-extras.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <div id="sidebarAdmin" data-ativo="pedidos"></div>
+
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1 id="tituloFormulario">Novo pedido</h1>
+    </div>
+
+    <div class="painel">
+      <form id="formPedido" novalidate style="max-width:620px">
+        <div class="campo-grupo">
+          <label for="pedidoNome">Nome do cliente</label>
+          <input type="text" id="pedidoNome" class="form-control" maxlength="150" required>
+        </div>
+        <div class="campo-grupo">
+          <label for="pedidoTelefone">Telefone</label>
+          <input type="text" id="pedidoTelefone" class="form-control" maxlength="30" required placeholder="(44) 99999-9999">
+        </div>
+        <div class="campo-grupo">
+          <label for="pedidoEmail">E-mail (opcional)</label>
+          <input type="email" id="pedidoEmail" class="form-control" maxlength="150">
+        </div>
+        <div class="campo-grupo" id="grupoStatus" style="display:none">
+          <label for="pedidoStatus">Status</label>
+          <select id="pedidoStatus" class="form-select">
+            <option value="aguardando_pagamento">Aguardando PIX</option>
+            <option value="pago">Pago (abate o estoque)</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+
+        <!-- Cadastro: escolher itens -->
+        <div id="blocoItensNovo">
+          <label style="display:block;margin-bottom:8px">Itens do pedido</label>
+          <div id="listaItens"></div>
+          <button type="button" class="botao-secundario" id="botaoAdicionarItem">+ Adicionar item</button>
+          <div class="total-pedido">Total: <span id="totalPedido">R$ 0,00</span></div>
+        </div>
+
+        <!-- Edição: itens só para leitura (a API não altera itens) -->
+        <div id="blocoItensLeitura" style="display:none">
+          <label style="display:block;margin-bottom:8px">Itens (não editáveis)</label>
+          <table class="detalhe-itens"><tbody id="itensLeitura"></tbody></table>
+          <div class="total-pedido">Total: <span id="totalLeitura"></span></div>
+        </div>
+
+        <div class="modal-acoes" style="display:flex;gap:12px;margin-top:22px">
+          <button type="button" class="botao-secundario" id="botaoCancelarPedido">Cancelar</button>
+          <button type="submit" class="botao-primario btn" id="botaoSalvarPedido">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </main>
+</div>
+
+<!-- Código em TypeScript: ts/admin/paginaPedidoForm.ts (compilado para js/admin/paginaPedidoForm.js) -->
+<script type="module" src="../../js/admin/paginaPedidoForm.js"></script>
+
+</body>
+</html>

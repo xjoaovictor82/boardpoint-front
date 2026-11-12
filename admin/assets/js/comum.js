@@ -1,19 +1,32 @@
-/* =========================================================================
-   BOARD POINT — Admin: script compartilhado entre todas as páginas internas
-   Protege a sessão, cuida do botão sair, toasts e helper de requisição.
-   ========================================================================= */
+/* BOARD POINT — Admin: script compartilhado entre as páginas internas.
+   Autenticação por JWT: o token fica no localStorage e vai em
+   "Authorization: Bearer ..." em toda requisição. */
 
-// Caminho relativo até a pasta api/, a partir de admin/pages/*.html
 const API_BASE = '../api/';
+const CHAVE_TOKEN_ADMIN = 'bp_admin_token';
+
+function lerTokenAdmin() {
+  try { return localStorage.getItem(CHAVE_TOKEN_ADMIN); } catch { return null; }
+}
+
+function apagarTokenAdmin() {
+  try { localStorage.removeItem(CHAVE_TOKEN_ADMIN); } catch { /* ignora */ }
+}
+
+function irParaLogin() {
+  apagarTokenAdmin();
+  window.location.href = '../login.html';
+}
 
 async function apiFetch(caminho, opcoes = {}) {
-  const resp = await fetch(API_BASE + caminho, {
-    credentials: 'same-origin',
-    ...opcoes,
-  });
+  const headers = new Headers(opcoes.headers || {});
+  const token = lerTokenAdmin();
+  if (token) headers.set('Authorization', 'Bearer ' + token);
+
+  const resp = await fetch(API_BASE + caminho, { ...opcoes, headers });
   const data = await resp.json();
   if (!data.sucesso && resp.status === 401) {
-    window.location.href = '../login.html';
+    irParaLogin();
     throw new Error('Não autenticado');
   }
   return data;
@@ -34,17 +47,21 @@ function mostrarToast(mensagem, tipo = 'sucesso') {
 }
 
 async function protegerPagina() {
+  if (!lerTokenAdmin()) {
+    irParaLogin();
+    return null;
+  }
   try {
     const data = await apiFetch('auth.php?acao=status');
-    if (!data.dados.autenticado) {
-      window.location.href = '../login.html';
+    if (!data.dados || !data.dados.autenticado) {
+      irParaLogin();
       return null;
     }
     const elUsuario = document.getElementById('usuarioLogado');
     if (elUsuario) elUsuario.textContent = data.dados.usuario;
     return data.dados.usuario;
   } catch (e) {
-    window.location.href = '../login.html';
+    irParaLogin();
     return null;
   }
 }
@@ -53,8 +70,8 @@ function configurarBotaoSair() {
   const botao = document.getElementById('botaoSair');
   if (!botao) return;
   botao.addEventListener('click', async () => {
-    await apiFetch('auth.php?acao=logout', { method: 'POST' });
-    window.location.href = '../login.html';
+    try { await apiFetch('auth.php?acao=logout', { method: 'POST' }); } catch { /* sai mesmo assim */ }
+    irParaLogin();
   });
 }
 

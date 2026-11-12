@@ -8,7 +8,7 @@ export class RepositorioCategorias extends RepositorioApi {
         return Categoria.deDto(dto);
     }
     async listar() {
-        const dtos = await this.cliente.obter("categorias.php");
+        const dtos = await this.cliente.obter("publico/categorias.php");
         return this.converterLista(dtos);
     }
 }

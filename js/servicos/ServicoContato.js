@@ -4,6 +4,6 @@ export class ServicoContato {
         this.#cliente = cliente;
     }
     async enviar(contato) {
-        await this.#cliente.enviarJson("contato.php", contato);
+        await this.#cliente.enviarJson("publico/contato.php", contato);
     }
 }
