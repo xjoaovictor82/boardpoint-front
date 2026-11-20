@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 
 // Em desenvolvimento (npm run dev) a API PHP, as fotos e os assets vêm do
@@ -16,5 +16,14 @@ export default defineConfig({
       '/assets': destino,
     },
   },
-  build: { outDir: 'dist', sourcemap: false },
+  // assetsDir diferente de "assets": em produção /assets/ já é usado pelas
+  // fotos do site (front/assets), servidas por fora do build (ver
+  // front/app/docker/default.conf). Sem isso, o JS/CSS do build cairia no
+  // mesmo caminho das fotos e um dos dois "sumiria".
+  build: { outDir: 'dist', assetsDir: 'build-assets', sourcemap: false },
+  test: {
+    environment: 'jsdom',
+    setupFiles: ['./src/testes/preparar.ts'],
+    restoreMocks: true,
+  },
 });
