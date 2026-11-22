@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu perfil — Board Point</title>
+<link rel="icon" href="../assets/img/logo.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="../css/conta.css">
+</head>
+<body class="pagina-conta">
+
+<main class="auth">
+  <a class="auth__marca" href="../index.html"><img src="../assets/img/logo.jpg" alt="Logo Board Point"><span>Board <b>Point</b></span></a>
+
+  <section class="auth__caixa">
+    <h1>Meu perfil</h1>
+    <p class="auth__sub">Veja e edite os dados da sua conta.</p>
+    <div id="alerta" class="alerta" role="alert" hidden></div>
+
+    <form id="formPerfil" novalidate hidden>
+      <div class="campo">
+        <label for="campo-nome">Nome completo</label>
+        <input id="campo-nome" class="campo__entrada" type="text" autocomplete="name" maxlength="150" required>
+        <small id="erro-nome" class="campo__erro"></small>
+      </div>
+      <div class="campo">
+        <label for="campo-email">E-mail</label>
+        <input id="campo-email" class="campo__entrada" type="email" autocomplete="email" disabled>
+        <small class="campo__dica">O e-mail não pode ser alterado.</small>
+      </div>
+      <div class="campo">
+        <label for="campo-cpf">CPF</label>
+        <input id="campo-cpf" class="campo__entrada" type="text" autocomplete="off" inputmode="numeric" maxlength="14" required>
+        <small id="erro-cpf" class="campo__erro"></small>
+      </div>
+      <div class="campo">
+        <label for="campo-senha">Nova senha (opcional)</label>
+        <input id="campo-senha" class="campo__entrada" type="password" autocomplete="new-password" placeholder="Deixe em branco para manter a atual">
+        <small id="erro-senha" class="campo__erro"></small>
+      </div>
+      <div class="campo">
+        <label for="campo-confirmarSenha">Confirme a nova senha</label>
+        <input id="campo-confirmarSenha" class="campo__entrada" type="password" autocomplete="new-password" placeholder="Repita a nova senha">
+        <small id="erro-confirmarSenha" class="campo__erro"></small>
+      </div>
+      <button id="botaoSalvar" class="auth__botao" type="submit">Salvar alterações</button>
+      <button id="botaoSair" class="auth__botao auth__botao--secundario" type="button">Sair da conta</button>
+    </form>
+  </section>
+
+  <a class="auth__voltar" href="../index.html">&larr; Voltar à loja</a>
+</main>
+
+<script type="module" src="../js/cliente/paginaPerfil.js"></script>
+</body>
+</html>
