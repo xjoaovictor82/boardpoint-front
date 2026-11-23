@@ -32,14 +32,14 @@ export class ServicoAdmin {
     const erro = primeiroErro(errosLogin(email, senha));
     if (erro) throw new ErroValidacao(erro);
 
-    const resposta = await this.#http.enviarJson<RespostaLoginAdmin>("auth.php?acao=login", { email, senha });
+    const resposta = await this.#http.enviarJson<RespostaLoginAdmin>("auth/login", { email, senha });
     this.#sessao.iniciar(resposta.token, resposta.usuario);
   }
 
   /** Confirma no servidor que o token salvo ainda vale e atualiza o nome exibido na sidebar. */
   async confirmarSessao(): Promise<void> {
     try {
-      const status = await this.#http.obter<RespostaStatus>("auth.php?acao=status");
+      const status = await this.#http.obter<RespostaStatus>("auth/status");
       this.#sessao.definirNome(status.usuario ?? "");
     } catch (erro) {
       this.#sessao.encerrar();
@@ -49,7 +49,7 @@ export class ServicoAdmin {
   }
 
   sair(): void {
-    void this.#http.enviarJson<null>("auth.php?acao=logout", {}).catch(() => undefined);
+    void this.#http.enviarJson<null>("auth/logout", {}).catch(() => undefined);
     this.#sessao.encerrar();
   }
 }

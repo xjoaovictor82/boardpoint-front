@@ -35,15 +35,15 @@ export class ServicoCrud {
         return todos;
     }
     obter(id) {
-        return this.http.obter(`${this.recurso}?id=${id}`);
+        return this.http.obter(`${this.recurso}/${id}`);
     }
     criar(entrada) {
         return this.http.enviarJson(this.recurso, entrada);
     }
     editar(id, entrada) {
-        return this.http.atualizarJson(`${this.recurso}?id=${id}`, entrada);
+        return this.http.atualizarJson(`${this.recurso}/${id}`, entrada);
     }
     excluir(id) {
-        return this.http.excluir(`${this.recurso}?id=${id}`);
+        return this.http.excluir(`${this.recurso}/${id}`);
     }
 }

@@ -9,6 +9,6 @@ import type { EntradaPedido, PedidoAdmin, ResultadoPedido } from "./tipos";
  */
 export class ServicoPedidosAdmin extends ServicoCrud<PedidoAdmin, EntradaPedido, ResultadoPedido> {
   constructor(http: ClienteHttp) {
-    super(http, "pedidos.php");
+    super(http, "pedidos");
   }
 }

@@ -31,7 +31,7 @@ export async function iniciarPaginaAdmin(): Promise<ContextoAdmin | null> {
   const api = new ClienteApi("../api/", () => sessao.irParaLogin(), CHAVE_TOKEN_ADMIN);
 
   try {
-    const status = await api.obter<RespostaStatus>("auth.php?acao=status");
+    const status = await api.obter<RespostaStatus>("auth/status");
     const nome = document.getElementById("usuarioLogado");
     if (nome !== null) nome.textContent = status.usuario ?? "";
   } catch (erro) {
@@ -43,7 +43,7 @@ export async function iniciarPaginaAdmin(): Promise<ContextoAdmin | null> {
   }
 
   document.getElementById("botaoSair")?.addEventListener("click", () => {
-    void api.enviarJson<null>("auth.php?acao=logout", {}).catch(() => undefined).finally(() => sessao.irParaLogin());
+    void api.enviarJson<null>("auth/logout", {}).catch(() => undefined).finally(() => sessao.irParaLogin());
   });
 
   return { api, sessao };

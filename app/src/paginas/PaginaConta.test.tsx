@@ -19,7 +19,7 @@ function abrir(rota: string) {
 }
 
 const ehConta = (r: Requisicao, acao: string, metodo: string): boolean =>
-  r.url.includes(`clientes.php?acao=${acao}`) && r.metodo === metodo;
+  r.url.includes(`clientes/${acao}`) && r.metodo === metodo;
 
 function entrarComoMaria(): void {
   sessao.iniciar(criarToken(), 'Maria Souza');
@@ -60,7 +60,7 @@ describe('Login', () => {
     await usuario.click(screen.getByRole('button', { name: 'Entrar' }));
     expect(screen.getByText('Informe seu e-mail.')).toBeInTheDocument();
     expect(screen.getByText('Informe sua senha.')).toBeInTheDocument();
-    expect(requisicoes.some((r) => r.url.includes('clientes.php'))).toBe(false);
+    expect(requisicoes.some((r) => r.url.includes('clientes/'))).toBe(false);
 
     // o erro some quando a pessoa volta a digitar naquele campo
     await usuario.type(screen.getByLabelText('E-mail'), 'a');
@@ -161,7 +161,7 @@ describe('Cadastro', () => {
 
     expect(screen.getByText(/A senha deve ter no mínimo 8 caracteres/)).toBeInTheDocument();
     expect(screen.getByText('As senhas não coincidem.')).toBeInTheDocument();
-    expect(requisicoes.some((r) => r.url.includes('clientes.php'))).toBe(false);
+    expect(requisicoes.some((r) => r.url.includes('clientes/'))).toBe(false);
   });
 
   it('sugere uma senha forte, mostra nas duas caixas e libera o botão de copiar', async () => {

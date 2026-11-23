@@ -5,17 +5,17 @@ import type { EntradaProduto, ResultadoProduto } from "./tipos";
 /** Produtos têm upload de imagem: por isso enviam multipart/form-data em vez de JSON. */
 export class ServicoProdutos extends ServicoCrud<ProdutoDto, EntradaProduto, ResultadoProduto> {
   constructor(http: ClienteHttp) {
-    super(http, "produtos.php");
+    super(http, "produtos");
   }
 
   override criar(entrada: EntradaProduto): Promise<ResultadoProduto> {
     return this.http.enviarFormulario<ResultadoProduto>(this.recurso, this.#paraFormulario(entrada));
   }
 
-  /** PHP não preenche $_FILES em PUT: o servidor aceita POST com ?_method=PUT. */
+  /** PUT /api/produtos/:id com multipart (a imagem é opcional na edição). */
   override editar(id: number, entrada: Partial<EntradaProduto>): Promise<ResultadoProduto> {
-    return this.http.enviarFormulario<ResultadoProduto>(
-      `${this.recurso}?id=${id}&_method=PUT`,
+    return this.http.atualizarFormulario<ResultadoProduto>(
+      `${this.recurso}/${id}`,
       this.#paraFormulario(entrada),
     );
   }

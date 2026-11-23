@@ -39,6 +39,11 @@ export class ClienteApi implements ClienteHttp {
     return this.#requisitar<T>(caminho, { method: "POST", body: corpo });
   }
 
+  /** PUT multipart/form-data (edição com upload). */
+  atualizarFormulario<T>(caminho: string, corpo: FormData): Promise<T> {
+    return this.#requisitar<T>(caminho, { method: "PUT", body: corpo });
+  }
+
   #comCorpoJson(metodo: string, corpo: unknown): RequestInit {
     return {
       method: metodo,

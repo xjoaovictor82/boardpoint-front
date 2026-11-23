@@ -44,19 +44,19 @@ export class ServicoCrud<TEntidade, TEntrada, TResultado = TEntidade> {
     return todos;
   }
 
-  obter(id: number): Promise<TEntidade> {
-    return this.http.obter<TEntidade>(`${this.recurso}?id=${id}`);
+    obter(id: number): Promise<TEntidade> {
+    return this.http.obter<TEntidade>(`${this.recurso}/${id}`);
   }
 
   criar(entrada: TEntrada): Promise<TResultado> {
     return this.http.enviarJson<TResultado>(this.recurso, entrada);
   }
 
-  editar(id: number, entrada: Partial<TEntrada>): Promise<TResultado> {
-    return this.http.atualizarJson<TResultado>(`${this.recurso}?id=${id}`, entrada);
+   editar(id: number, entrada: Partial<TEntrada>): Promise<TResultado> {
+    return this.http.atualizarJson<TResultado>(`${this.recurso}/${id}`, entrada);
   }
 
   excluir(id: number): Promise<null> {
-    return this.http.excluir<null>(`${this.recurso}?id=${id}`);
+    return this.http.excluir<null>(`${this.recurso}/${id}`);
   }
 }

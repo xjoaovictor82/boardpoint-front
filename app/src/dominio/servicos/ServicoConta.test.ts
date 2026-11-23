@@ -75,7 +75,7 @@ describe('ServicoConta', () => {
     const sessao = new SessaoUsuario();
     await new ServicoConta(criarHttp({ enviarJson }), sessao).entrar('maria@x.com', 'Abcdef1!');
 
-    expect(enviarJson).toHaveBeenCalledWith('clientes.php?acao=login', { email: 'maria@x.com', senha: 'Abcdef1!' });
+    expect(enviarJson).toHaveBeenCalledWith('clientes/login', { email: 'maria@x.com', senha: 'Abcdef1!' });
     expect(sessao.estaLogado()).toBe(true);
     expect(sessao.nome).toBe('Maria Souza');
   });
@@ -86,7 +86,7 @@ describe('ServicoConta', () => {
     await new ServicoConta(criarHttp({ enviarJson }), sessao).cadastrar({
       nome: 'Maria Souza', email: 'maria@x.com', cpf: '529.982.247-25', senha: 'Abcdef1!', confirmarSenha: 'Abcdef1!',
     });
-    expect(enviarJson).toHaveBeenCalledWith('clientes.php?acao=registrar', {
+    expect(enviarJson).toHaveBeenCalledWith('clientes/registrar', {
       nome: 'Maria Souza', email: 'maria@x.com', cpf: '52998224725', senha: 'Abcdef1!',
     });
     expect(sessao.estaLogado()).toBe(false);
@@ -100,7 +100,7 @@ describe('ServicoConta', () => {
       nome: 'Maria Nova', email: '', cpf: '529.982.247-25', senha: '', confirmarSenha: '',
     });
 
-    expect(atualizarJson).toHaveBeenCalledWith('clientes.php?acao=perfil', {
+    expect(atualizarJson).toHaveBeenCalledWith('clientes/perfil', {
       nome: 'Maria Nova', email: 'maria@x.com', cpf: '52998224725',
     });
     expect(perfil.nome).toBe('Maria Nova');
@@ -111,6 +111,6 @@ describe('ServicoConta', () => {
     const enviarJson = vi.fn().mockResolvedValue({ senha: 'Abc123!xyz456' });
     const senha = await new ServicoConta(criarHttp({ enviarJson }), new SessaoUsuario()).sugerirSenha();
     expect(senha).toBe('Abc123!xyz456');
-    expect(enviarJson).toHaveBeenCalledWith('clientes.php?acao=sugerir-senha', {});
+    expect(enviarJson).toHaveBeenCalledWith('clientes/sugerir-senha', {});
   });
 });

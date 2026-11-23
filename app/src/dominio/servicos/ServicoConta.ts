@@ -33,7 +33,7 @@ export class ServicoConta {
     const erro = primeiroErro(errosLogin(email, senha));
     if (erro) throw new ErroValidacao(erro);
 
-    const resposta = await this.#http.enviarJson<RespostaLogin>("clientes.php?acao=login", { email, senha });
+    const resposta = await this.#http.enviarJson<RespostaLogin>("clientes/login", { email, senha });
     this.#sessao.iniciar(resposta.token, resposta.nome);
   }
 
@@ -41,7 +41,7 @@ export class ServicoConta {
     const erro = primeiroErro(errosConta(campos, true, true));
     if (erro) throw new ErroValidacao(erro);
 
-    await this.#http.enviarJson<null>("clientes.php?acao=registrar", {
+    await this.#http.enviarJson<null>("clientes/registrar", {
       nome: campos.nome,
       email: campos.email,
       cpf: somenteDigitos(campos.cpf),
@@ -51,12 +51,12 @@ export class ServicoConta {
 
   /** Pede ao servidor uma senha forte (a IA nunca recebe dados da pessoa). */
   async sugerirSenha(): Promise<string> {
-    const { senha } = await this.#http.enviarJson<{ senha: string }>("clientes.php?acao=sugerir-senha", {});
+    const { senha } = await this.#http.enviarJson<{ senha: string }>("clientes/sugerir-senha", {});
     return senha;
   }
 
   obterPerfil(): Promise<Perfil> {
-    return this.#http.obter<Perfil>("clientes.php?acao=perfil");
+    return this.#http.obter<Perfil>("clientes/perfil");
   }
 
   /** O e-mail é enviado só porque o servidor o exige igual ao cadastrado: ele não pode mudar. */
@@ -71,7 +71,7 @@ export class ServicoConta {
     };
     if (campos.senha !== "") corpo["senha"] = campos.senha;
 
-    const perfil = await this.#http.atualizarJson<Perfil>("clientes.php?acao=perfil", corpo);
+    const perfil = await this.#http.atualizarJson<Perfil>("clientes/perfil", corpo);
     this.#sessao.definirNome(perfil.nome);
     return perfil;
   }

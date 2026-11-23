@@ -42,8 +42,8 @@ function iniciar(): void {
     botao.disabled = true;
     void (async () => {
       try {
-        const resposta = await api.enviarJson<RespostaLoginAdmin>(
-          "auth.php?acao=login",
+                const resposta = await api.enviarJson<RespostaLoginAdmin>(
+          "auth/login",
           { email, senha },
         );
         localStorage.setItem(CHAVE_TOKEN_ADMIN, resposta.token);

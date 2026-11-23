@@ -109,6 +109,7 @@ export interface ClienteHttp {
   atualizarJson<T>(caminho: string, corpo: unknown): Promise<T>;
   excluir<T>(caminho: string): Promise<T>;
   enviarFormulario<T>(caminho: string, corpo: FormData): Promise<T>;
+  atualizarFormulario<T>(caminho: string, corpo: FormData): Promise<T>; // <-- NOVA
 }
 
 export interface Armazenamento<T> {

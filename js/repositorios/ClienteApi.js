@@ -29,6 +29,10 @@ export class ClienteApi {
     enviarFormulario(caminho, corpo) {
         return this.#requisitar(caminho, { method: "POST", body: corpo });
     }
+    /** PUT multipart/form-data (edição com upload). */
+    atualizarFormulario(caminho, corpo) {
+        return this.#requisitar(caminho, { method: "PUT", body: corpo });
+    }
     #comCorpoJson(metodo, corpo) {
         return {
             method: metodo,

@@ -30,7 +30,7 @@ function iniciar() {
         botao.disabled = true;
         void (async () => {
             try {
-                const resposta = await api.enviarJson("auth.php?acao=login", { email, senha });
+                const resposta = await api.enviarJson("auth/login", { email, senha });
                 localStorage.setItem(CHAVE_TOKEN_ADMIN, resposta.token);
                 window.location.href = "pages/dashboard.html";
             }

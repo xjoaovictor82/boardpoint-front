@@ -17,7 +17,7 @@ export async function iniciarPaginaAdmin() {
     // Página em /admin/pages/ -> API em /admin/api/
     const api = new ClienteApi("../api/", () => sessao.irParaLogin(), CHAVE_TOKEN_ADMIN);
     try {
-        const status = await api.obter("auth.php?acao=status");
+        const status = await api.obter("auth/status");
         const nome = document.getElementById("usuarioLogado");
         if (nome !== null)
             nome.textContent = status.usuario ?? "";
@@ -30,7 +30,7 @@ export async function iniciarPaginaAdmin() {
         throw erro;
     }
     document.getElementById("botaoSair")?.addEventListener("click", () => {
-        void api.enviarJson("auth.php?acao=logout", {}).catch(() => undefined).finally(() => sessao.irParaLogin());
+        void api.enviarJson("auth/logout", {}).catch(() => undefined).finally(() => sessao.irParaLogin());
     });
     return { api, sessao };
 }
